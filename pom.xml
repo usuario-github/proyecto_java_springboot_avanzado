@@ -27,6 +27,7 @@
         <module>eureka-service</module>
         <module>configuracion-service</module>
         <module>commons</module>
+        <module>inventario-service</module>
     </modules>
     <scm>
 		<connection/>

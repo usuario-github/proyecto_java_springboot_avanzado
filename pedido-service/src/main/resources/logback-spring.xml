@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Salida por consola por defecto de Spring Boot (incluye [app,traceId,spanId]) -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+    <springProperty scope="context" name="appName" source="spring.application.name" defaultValue="desconocido"/>
+    <springProperty scope="context" name="logstashDestino" source="logging.logstash.destination" defaultValue="localhost:5000"/>
+
+    <!-- Envía cada log en JSON a Logstash por TCP (asíncrono: si Logstash no está, la app sigue funcionando) -->
+    <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>${logstashDestino}</destination>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <!-- No enviar las variables internas de logback (appName, logstashDestino) -->
+            <includeContext>false</includeContext>
+            <!-- "app" identifica al microservicio en Logstash/Kibana; traceId y spanId llegan desde el MDC -->
+            <customFields>{"app":"${appName}"}</customFields>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="LOGSTASH"/>
+    </root>
+</configuration>
